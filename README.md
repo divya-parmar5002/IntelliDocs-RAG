@@ -1,154 +1,174 @@
-# Quivr - Your Second Brain, Empowered by Generative AI
+IntelliDocs — Local AI Document Q&A using RAG
 
-<div align="center">
-    <img src="./logo.png" alt="Quivr-logo" width="30%"  style="border-radius: 50%; padding-bottom: 20px"/>
-</div>
+IntelliDocs is an AI-powered document question-answering application. Users can upload documents, create separate workspaces, and ask questions in natural language.
 
-[![Discord Follow](https://dcbadge.vercel.app/api/server/HUpRgp2HG8?style=flat)](https://discord.gg/HUpRgp2HG8)
-[![GitHub Repo stars](https://img.shields.io/github/stars/quivrhq/quivr?style=social)](https://github.com/quivrhq/quivr)
-[![Twitter Follow](https://img.shields.io/twitter/follow/StanGirard?style=social)](https://twitter.com/_StanGirard)
+Instead of manually searching exact keywords in large PDFs, IntelliDocs uses Retrieval-Augmented Generation (RAG) to retrieve semantically relevant document content and generate an answer grounded in that context.
 
-Quivr, your second brain, utilizes the power of GenerativeAI to be your personal assistant ! Think of it as Obsidian, but turbocharged with AI capabilities.
+This is an academic customization of the open-source Quivr project, adapted for a local Ollama-based RAG workflow.
 
-[Roadmap here](https://docs.quivr.app/docs/roadmap)
+Table of Contents
+Problem Statement
+Key Features
+Architecture
+RAG Workflow
+Tech Stack
+Workspace Isolation
+Prerequisites
+Local Setup
+Manual Docker Start
+Important Notes
+Author
+Problem Statement
 
-## Key Features 🎯
+Traditional document search often requires users to know the exact keyword and manually read through long documents.
 
-- **Fast and Efficient**: Designed with speed and efficiency at its core. Quivr ensures rapid access to your data.
-- **Secure**: Your data, your control. Always.
-- **OS Compatible**: Ubuntu 22 or newer.
-- **File Compatibility**: Text, Markdown, PDF, Powerpoint, Excel, CSV, Word, Audio, Video
-- **Open Source**: Freedom is beautiful, and so is Quivr. Open source and free to use.
-- **Public/Private**: Share your brains with your users via a public link, or keep them private.
-- **Marketplace**: Share your brains with the world, or use other people's brains to boost your productivity.
-- **Offline Mode**: Quivr works offline, so you can access your data anytime, anywhere.
+IntelliDocs helps users ask questions such as:
 
-## Demo Highlights 🎥
+text
+What is cloud computing?
+What are the types of grid computing?
+Explain token-based authentication.
 
-https://github.com/quivrhq/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
+The system searches relevant uploaded-document chunks and uses them as context for the answer.
 
-## Getting Started 🚀
+Key Features
+Upload and query documents through a web interface.
+Natural-language document question answering.
+Semantic search using text embeddings instead of only exact keyword matching.
+Workspace-based document isolation using brain_id.
+Local answer generation using Ollama and Llama 3.2.
+Local embedding generation using nomic-embed-text.
+Docker-based local setup.
+Streaming answer support in the chat interface.
+Retry handling for temporary embedding-service failures.
+Redis and Celery support for background processing.
+Architecture
+text
+User
+  ↓
+React / Next.js Frontend
+  ↓
+FastAPI Backend
+  ↓
+Question Embedding — nomic-embed-text via Ollama
+  ↓
+pgvector Similarity Search — filtered by brain_id
+  ↓
+Relevant Document Chunks
+  ↓
+Question + Retrieved Context
+  ↓
+Llama 3.2 via Ollama
+  ↓
+Generated Answer in Chat UI
+RAG Workflow
+1. Document ingestion
+text
+Document upload
+  → Text extraction
+  → Chunking
+  → Chunk embeddings
+  → Storage in Supabase PostgreSQL with pgvector
+2. Question answering
+text
+User question
+  → Question embedding
+  → Semantic similarity search
+  → Workspace-scoped retrieval using brain_id
+  → Relevant chunks added to prompt
+  → Llama 3.2 generates an answer
+Tech Stack
+Layer	Technology
+Frontend	React / Next.js
+Backend	Python / FastAPI
+LLM runtime	Ollama
+Chat model	Llama 3.2 (llama3.2:3b)
+Embedding model	nomic-embed-text
+Database	Supabase PostgreSQL
+Vector search	pgvector
+Background processing	Celery + Redis
+Containerization	Docker Compose
+Workspace Isolation
 
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+Each workspace is represented by a brain_id.
 
-You can find everything on the [documentation](https://docs.quivr.app/).
+When a user asks a question, vector retrieval is scoped to the selected brain_id. This helps ensure that documents from one workspace are not mixed with documents from another workspace.
 
-### Prerequisites 📋
+text
+Selected workspace
+  → brain_id filter
+  → Search only that workspace's document chunks
+  → Generate answer from relevant context
+Prerequisites
 
-Ensure you have the following installed:
+Install the following before starting:
 
-- Docker
-- Docker Compose
+Docker Desktop
+Ollama for Windows
+Git
+At least 8 GB RAM recommended for local model execution
 
-### 60 seconds Installation 💽
+Pull the required local models:
 
-You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6dZJN48).
+powershell
+ollama pull nomic-embed-text
+ollama pull llama3.2:3b
+Local Setup
 
-- **Step 0**: Supabase CLI
+Clone the repository:
 
-  Follow the instructions [here](https://supabase.com/docs/guides/cli/getting-started) to install the Supabase CLI that is required.
+powershell
+git clone https://github.com/divya-parmar5002/IntelliDocs-RAG.git
+cd IntelliDocs-RAG
 
-  ```bash
-  supabase -v # Check that the installation worked
-  ```
+Create your local environment file:
 
+powershell
+Copy-Item .env.example .env
 
-- **Step 1**: Clone the repository:
+Ensure Ollama is configured in .env:
 
-  ```bash
-  git clone https://github.com/quivrhq/quivr.git && cd quivr
-  ```
+env
+OLLAMA_API_BASE_URL=http://host.docker.internal:11434
 
-- **Step 2**: Copy the `.env.example` files
+Start the application:
 
-  ```bash
-  cp .env.example .env
-  ```
+powershell
+.\Start-IntelliDocs.cmd
 
-- **Step 3**: Update the `.env` files
+Then open:
 
-  ```bash
-  vim .env # or emacs or vscode or nano
-  ```
+text
+http://localhost:3000
 
-  Update **OPENAI_API_KEY** in the `.env` file.
+Backend health check:
 
-  You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
+text
+http://localhost:5050/healthz
+Manual Docker Start
 
+If needed, start the services manually:
 
-- **Step 4**: Launch the project
+powershell
+docker compose up -d
 
-  ```bash
-  cd backend && supabase start
-  ```
-  and then 
-  ```bash
-  cd ../
-  docker compose pull
-  docker compose up
-  ```
+Check running containers:
 
-  If you have a Mac, go to Docker Desktop > Settings > General and check that the "file sharing implementation" is set to `VirtioFS`.
+powershell
+docker compose ps
 
-  If you are a developer, you can run the project in development mode with the following command: `docker compose -f docker-compose.dev.yml up --build`
+Check backend logs:
 
-- **Step 5**: Login to the app
+powershell
+docker logs backend-core --tail 100
+Important Notes
+Do not upload .env to GitHub.
+Local CPU-only inference can be slower than cloud/GPU models.
+Answer quality depends on document text extraction, chunking, retrieval quality, and the local LLM.
+If a document does not contain the requested information, the system may not provide a reliable answer.
+LICENSE is retained because this project is derived from the open-source Quivr project.
+Author
 
-  You can now sign in to the app with `admin@quivr.app` & `admin`. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
+Divya Parmar
 
-  You can access Quivr backend API at [http://localhost:5050/docs](http://localhost:5050/docs)
-
-  You can access supabase at [http://localhost:54323](http://localhost:54323)
-
-## Updating Quivr 🚀
-
-- **Step 1**: Pull the latest changes
-
-  ```bash
-  git pull
-  ```
-
-- **Step 2**: Update the migration
-
-  ```bash
-  supabase migration up
-  ```
-
-
-## Contributors ✨
-
-Thanks go to these wonderful people:
-<a href="https://github.com/quivrhq/quivr/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=quivrhq/quivr" />
-</a>
-
-## Contribute 🤝
-
-Did you get a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
-
-- [Open Issues](https://github.com/quivrhq/quivr/issues)
-- [Open Pull Requests](https://github.com/quivrhq/quivr/pulls)
-- [Good First Issues](https://github.com/quivrhq/quivr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
-- [Frontend Issues](https://github.com/quivrhq/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
-- [Backend Issues](https://github.com/quivrhq/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
-- [Translate](https://docs.quivr.app/docs/Developers/contribution/guidelines#translations)
-
-## Partners ❤️
-
-This project would not be possible without the support of our partners. Thank you for your support!
-
-
-<a href="https://ycombinator.com/">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Y_Combinator_logo.svg/1200px-Y_Combinator_logo.svg.png" alt="YCombinator" style="padding: 10px" width="70px">
-</a>
-<a href="https://www.theodo.fr/">
-  <img src="https://avatars.githubusercontent.com/u/332041?s=200&v=4" alt="Theodo" style="padding: 10px" width="70px">
-</a>
-
-## License 📄
-
-This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details
-
-## Stars History 📈
-
-[![Star History Chart](https://api.star-history.com/svg?repos=quivrhq/quivr&type=Timeline)](https://star-history.com/#quivrhq/quivr&Timeline)
+Academic project: IntelliDocs — Local AI-Powered Document Question Answering using RAG.
