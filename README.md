@@ -1,4 +1,4 @@
-IntelliDocs — Local AI Document Q&A using RAG
+#IntelliDocs — Local AI Document Q&A using RAG
 
 IntelliDocs is an AI-powered document question-answering application. Users can upload documents, create separate workspaces, and ask questions in natural language.
 
