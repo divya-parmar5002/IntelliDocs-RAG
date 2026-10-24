@@ -1,0 +1,30 @@
+@use "@/styles/Spacings.module.scss";
+
+.text_button_wrapper {
+  display: flex;
+  align-items: center;
+  gap: Spacings.$spacing03;
+  cursor: pointer;
+  background-color: transparent;
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .black {
+    color: var(--text-3);
+
+    &:hover {
+      color: var(--primary-0);
+    }
+  }
+
+  .dangerous {
+    color: var(--dangerous);
+
+    &:hover {
+      color: var(--dangerous-0);
+    }
+  }
+}

@@ -1,0 +1,44 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.current_brain_wrapper {
+  background-color: var(--background-2);
+  padding-inline: Spacings.$spacing05;
+  padding-block: Spacings.$spacing01;
+  font-size: Typography.$small;
+  color: var(--text-1);
+
+  .brain_infos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+
+    .left {
+      display: flex;
+      gap: Spacings.$spacing02;
+      align-items: center;
+      @include Typography.EllipsisOverflow;
+
+      .title {
+        white-space: nowrap;
+      }
+
+      .brain_name_wrapper {
+        display: flex;
+        gap: Spacings.$spacing02;
+        align-items: center;
+        overflow: hidden;
+
+        .dark_image {
+          filter: invert(100%);
+        }
+
+        .brain_name {
+          color: var(--text-3);
+          @include Typography.EllipsisOverflow;
+        }
+      }
+    }
+  }
+}

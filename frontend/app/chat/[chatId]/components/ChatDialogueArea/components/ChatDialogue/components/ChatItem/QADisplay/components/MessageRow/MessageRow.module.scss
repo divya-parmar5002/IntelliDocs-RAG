@@ -1,0 +1,130 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.message_row_container {
+  display: flex;
+  flex-direction: column;
+  padding-right: Spacings.$spacing05;
+  width: 85%;
+  padding-block: Spacings.$spacing03;
+  gap: Spacings.$spacing03;
+
+  .message_row_content {
+    align-self: flex-end;
+    border-radius: Radius.$big;
+    width: fit-content;
+    padding-block: Spacings.$spacing03;
+    padding-inline: Spacings.$spacing05;
+  }
+
+  .message_header {
+    padding: Spacings.$spacing02;
+    overflow: hidden;
+  }
+
+  &.user {
+    align-self: flex-end;
+
+    .message_header {
+      align-self: flex-end;
+      display: flex;
+      gap: Spacings.$spacing02;
+      align-items: center;
+      color: var(--text-2);
+    }
+
+    .message_row_content {
+      background-color: var(--background-2);
+    }
+  }
+
+  &.brain {
+    .message_header {
+      display: flex;
+      gap: Spacings.$spacing04;
+      align-items: baseline;
+    }
+
+    .message_row_content {
+      align-self: flex-start;
+      background-color: var(--background-special-0);
+      margin-left: 1px;
+      position: relative;
+    }
+
+    .metadata_wrapper {
+      display: flex;
+      flex-direction: column;
+      left: Spacings.$spacing02;
+      top: calc(100% + #{Spacings.$spacing03});
+      gap: Spacings.$spacing03;
+
+      .sources_and_citations_wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: Spacings.$spacing03;
+        max-width: 100%;
+
+        .sources {
+          display: flex;
+          gap: Spacings.$spacing03;
+          flex-wrap: wrap;
+          max-width: 100%;
+        }
+
+        .citations {
+          display: flex;
+          flex-direction: column;
+          gap: Spacings.$spacing02;
+          padding: Spacings.$spacing03;
+          border: 1px solid var(--primary-0);
+          border-radius: Radius.$big;
+          font-size: Typography.$small;
+
+          .file_name_wrapper {
+            display: flex;
+            gap: Spacings.$spacing03;
+            align-items: center;
+
+            .box_title {
+              padding-block: Spacings.$spacing02;
+              font-weight: 600;
+            }
+
+            .source {
+              font-size: Typography.$tiny;
+            }
+          }
+
+          .box_title {
+            padding-block: Spacings.$spacing02;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .icons_wrapper {
+        visibility: hidden;
+        display: flex;
+        gap: Spacings.$spacing03;
+
+        .sources_icon_wrapper {
+          cursor: pointer;
+        }
+
+        &.sticky {
+          visibility: visible;
+        }
+      }
+    }
+
+    &:hover {
+      .metadata_wrapper {
+        .icons_wrapper {
+          visibility: visible;
+        }
+      }
+    }
+  }
+}
